@@ -4,6 +4,7 @@ import com.ningmeng.api.cmsapi.CmsPageControllerApi;
 import com.ningmeng.framework.domain.cms.CmsPage;
 import com.ningmeng.framework.domain.cms.request.QueryPageRequest;
 import com.ningmeng.framework.domain.cms.response.CmsPageResult;
+import com.ningmeng.framework.domain.cms.response.CmsPostPageResult;
 import com.ningmeng.framework.model.response.QueryResponseResult;
 import com.ningmeng.framework.model.response.ResponseResult;
 import com.ningmeng.manage_cms.service.CmsPageService;
@@ -24,6 +25,12 @@ public class CmsPageController implements CmsPageControllerApi{
     @PostMapping("/postPage/{pageId}")
     public ResponseResult post(@PathVariable("pageId") String pageId){
         return cmsPageService.postPage(pageId);
+    }
+
+    @PostMapping("postPageQuick")
+    @Override
+    public CmsPostPageResult postPageQuick(CmsPage cmsPage) {
+        return cmsPageService.postPageQuick(cmsPage);
     }
 
     @Override

@@ -3,6 +3,9 @@ package com.ningmeng.manage_course.service;
 import com.alibaba.druid.util.StringUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.ningmeng.framework.domain.cms.CmsPage;
+import com.ningmeng.framework.domain.cms.response.CmsPageResult;
+import com.ningmeng.framework.domain.cms.response.CmsPostPageResult;
 import com.ningmeng.framework.domain.course.CourseBase;
 import com.ningmeng.framework.domain.course.CourseMarket;
 import com.ningmeng.framework.domain.course.CoursePic;
@@ -11,15 +14,20 @@ import com.ningmeng.framework.domain.course.ext.CategoryNode;
 import com.ningmeng.framework.domain.course.ext.CourseInfo;
 import com.ningmeng.framework.domain.course.ext.TeachplanNode;
 import com.ningmeng.framework.domain.course.response.AddCourseResult;
+import com.ningmeng.framework.domain.course.response.CourseCode;
+import com.ningmeng.framework.domain.course.response.CoursePublishResult;
+import com.ningmeng.framework.domain.course.response.CourseView;
 import com.ningmeng.framework.domain.system.SysDictionary;
 import com.ningmeng.framework.exception.CustomExceptionCast;
 import com.ningmeng.framework.model.response.CommonCode;
 import com.ningmeng.framework.model.response.QueryResponseResult;
 import com.ningmeng.framework.model.response.QueryResult;
 import com.ningmeng.framework.model.response.ResponseResult;
+import com.ningmeng.manage_course.client.CmsPageClient;
 import com.ningmeng.manage_course.dao.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +39,19 @@ import java.util.Optional;
  */
 @Service
 public class CourseService {
+
+    @Value("${course-publish.dataUrlPre}")
+    private String publish_dataUrlPre;
+    @Value("${course-publish.pagePhysicalPath}")
+    private String publish_page_physicalpath;
+    @Value("${course-publish.pageWebPath}")
+    private String publish_page_webpath;
+    @Value("${course-publish.siteId}")
+    private String publish_siteId;
+    @Value("${course-publish.templateId}")
+    private String publish_templateId;
+    @Value("${course-publish.previewUrl}")
+    private String previewUrl;
 
     @Autowired
     CourseBaseRepository courseBaseRepository;
@@ -55,6 +76,108 @@ public class CourseService {
 
     @Autowired
     CoursePicRepository coursePicRepository;
+
+    @Autowired
+    CmsPageClient cmsPageClient;
+
+    //发布课程
+    public CoursePublishResult publish(String id){
+        CmsPage cmsPage = this.publish_to(id);
+        //调用一键发布接口
+        CmsPostPageResult cmsPostPageResult = cmsPageClient.postPageQuick(cmsPage);
+        if(!cmsPostPageResult.isSuccess()){
+            return new CoursePublishResult(CommonCode.FAIL,null);
+        }
+        //更新课程状态
+        this.saveCoursePubState(id);
+        //返回
+        return new CoursePublishResult(CommonCode.SUCCESS,cmsPostPageResult.getPageUrl());
+    }
+
+    //更新课程发布状态
+    private CourseBase saveCoursePubState(String courseId){
+        CourseBase courseBase = this.findCourseBaseById(courseId);
+        //更新发布状态
+        courseBase.setStatus("202002");
+        CourseBase save = courseBaseRepository.save(courseBase);
+        return save;
+    }
+
+    //封装cmspage 发布课程正式页面
+    public CmsPage publish_to(String courseId){
+        CourseBase one = this.findCourseBaseById(courseId);
+        //发布课程预览页面
+        CmsPage cmsPage = new CmsPage();
+        //站点
+        cmsPage.setSiteId(publish_siteId);
+        //模板
+        cmsPage.setTemplateId(publish_templateId);
+        //页面名称
+        cmsPage.setPageName(courseId+".html");
+        //页面别名
+        cmsPage.setPageAliase(one.getName());
+        //页面访问路径
+        cmsPage.setPageWebPath(publish_page_webpath);
+        //页面存储路径
+        cmsPage.setPagePhysicalPath(publish_page_physicalpath);
+        //数据url
+        cmsPage.setDataUrl(publish_dataUrlPre+courseId);
+        return cmsPage;
+    }
+
+    //根据id查询课程基本信息
+    @Transactional
+    public CourseBase findCourseBaseById(String courseId){
+        Optional<CourseBase> baseOptional = courseBaseRepository.findById(courseId);
+        if(baseOptional.isPresent()){
+            CourseBase courseBase = baseOptional.get();
+            return courseBase;
+        }
+        CustomExceptionCast.cast(CourseCode.COURSE_MEDIS_NAMEISNULL);
+        return null;
+    }
+    //课程预览
+    public CoursePublishResult preview(String courseId){
+        CmsPage cmsPage = this.publish_to(courseId);
+        //远程请求cms保存页面信息
+        CmsPageResult cmsPageResult = cmsPageClient.add(cmsPage);
+        if(!cmsPageResult.isSuccess()){
+            return new CoursePublishResult(CommonCode.FAIL,null);
+        }
+        //页面id
+        String pageId = cmsPageResult.getCmsPage().getPageId();
+        //页面url
+        String pageUrl = previewUrl+pageId;
+        return new CoursePublishResult(CommonCode.SUCCESS,pageUrl);
+    }
+
+
+    @Transactional
+    public CourseView getCourseView(String id){
+        CourseView courseView = new CourseView();
+        //查询课程基本信息
+        Optional<CourseBase> optional = courseBaseRepository.findById(id);
+        if(optional.isPresent()){
+            CourseBase courseBase = optional.get();
+            courseView.setCourseBase(courseBase);
+        }
+        //课程营销信息
+        Optional<CourseMarket> courseMarketOptional = courseMarketRepository.findById(id);
+        if(courseMarketOptional.isPresent()){
+            CourseMarket courseMarket = courseMarketOptional.get();
+            courseView.setCourseMarket(courseMarket);
+        }
+        //课程图片信息
+        Optional<CoursePic> picOptional = coursePicRepository.findById(id);
+        if(picOptional.isPresent()){
+            CoursePic coursePic = picOptional.get();
+            courseView.setCoursePic(coursePic);
+        }
+        //课程计划信息
+        TeachplanNode teachplanNode = teachplanMapper.selectList(id);
+        courseView.setTeachplanNode(teachplanNode);
+        return courseView;
+    }
 
     @Transactional
     public ResponseResult deleteCoursePic(String courseId){

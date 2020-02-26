@@ -8,6 +8,8 @@ import com.ningmeng.framework.domain.course.Teachplan;
 import com.ningmeng.framework.domain.course.ext.CategoryNode;
 import com.ningmeng.framework.domain.course.ext.TeachplanNode;
 import com.ningmeng.framework.domain.course.response.AddCourseResult;
+import com.ningmeng.framework.domain.course.response.CoursePublishResult;
+import com.ningmeng.framework.domain.course.response.CourseView;
 import com.ningmeng.framework.domain.system.SysDictionary;
 import com.ningmeng.framework.model.response.CommonCode;
 import com.ningmeng.framework.model.response.QueryResponseResult;
@@ -108,6 +110,24 @@ public class CourseController implements CourseControllerApi{
     @Override
     public ResponseResult deleteCoursePic(@RequestParam("courseId") String courseId) {
         return courseService.deleteCoursePic(courseId);
+    }
+
+    @GetMapping("/courseview/{id}")
+    @Override
+    public CourseView courseview(@PathVariable("id") String id) {
+        return courseService.getCourseView(id);
+    }
+
+    @PostMapping("/preview/{id}")
+    @Override
+    public CoursePublishResult preview(@PathVariable("id") String id) {
+        return courseService.preview(id);
+    }
+
+    @PostMapping("/publish/{id}")
+    @Override
+    public CoursePublishResult publish(@PathVariable("id") String id) {
+        return courseService.publish(id);
     }
 
 
