@@ -1,6 +1,7 @@
 package com.ningmeng.search.controller;
 
 import com.ningmeng.api.searchapi.EsCourseControllerApi;
+import com.ningmeng.framework.domain.course.CoursePub;
 import com.ningmeng.framework.domain.search.CourseSearchParam;
 import com.ningmeng.framework.model.response.QueryResponseResult;
 import com.ningmeng.search.service.EsCourseService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by 1 on 2020/2/28.
@@ -27,5 +29,11 @@ public class EsCourseController implements EsCourseControllerApi{
     @Override
     public QueryResponseResult list(@PathVariable("page") int page,@PathVariable("size") int size, CourseSearchParam courseSearchParam) throws IOException {
         return esCourseService.list(page,size,courseSearchParam);
+    }
+
+    @GetMapping("/getall/{id}")
+    @Override
+    public Map<String, CoursePub> getall(@PathVariable("id") String id) {
+        return esCourseService.getall(id);
     }
 }

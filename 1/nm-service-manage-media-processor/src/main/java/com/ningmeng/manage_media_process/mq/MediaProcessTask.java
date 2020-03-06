@@ -67,7 +67,7 @@ public class MediaProcessTask {
         Mp4VideoUtil videoUtil = new Mp4VideoUtil(ffmpeg_path,video_path,mp4_name,mp4folder_path);
         String result = videoUtil.generateMp4();
         System.out.println(result+"qwqwertyuioqwertyuiopqwertyuiop");
-        /*if(result == null || !result.equals("success")){
+        if(result == null || !result.equals("success")){
             //操作失败写入处理日志
             mediaFile.setProcessStatus("303003");//处理状态为处理失败
             MediaFileProcess_m3u8 mediaFileProcess_m3u8 = new MediaFileProcess_m3u8();
@@ -75,7 +75,7 @@ public class MediaProcessTask {
             mediaFile.setMediaFileProcess_m3u8(mediaFileProcess_m3u8);
             mediaFileRepository.save(mediaFile);
             return ;
-        }*/
+        }
         //生成m3u8...
         video_path = serverPath + mediaFile.getFilePath()+mp4_name;//此地址为mp4地址
         String m3u8_name = mediaFile.getFileId()+".m3u8";
