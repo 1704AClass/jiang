@@ -219,7 +219,7 @@ public class CourseService {
         this.saveTeachplanMediaPub(id);
 
         //返回
-        return new CoursePublishResult(CommonCode.SUCCESS,cmsPostPageResult.getPageUrl());
+        return new CoursePublishResult(CommonCode.SUCCESS,"cmsPostPageResult.getPageUrl()");
     }
 
     //更新课程发布状态
