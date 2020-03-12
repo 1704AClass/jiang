@@ -12,6 +12,12 @@
 
     <artifactId>nm-service-manage-course</artifactId>
     <dependencies>
+        <!--oauth2 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-oauth2</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.ningmeng</groupId>
             <artifactId>nm-service-api</artifactId>
