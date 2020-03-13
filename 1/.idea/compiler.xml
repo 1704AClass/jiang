@@ -11,6 +11,7 @@
         <module name="nm-framework-model" />
         <module name="nm-framework-utils" />
         <module name="nm-govern-center" />
+        <module name="nm-govern-gateway" />
         <module name="nm-service-api" />
         <module name="nm-service-base-filesystem" />
         <module name="nm-service-learning" />
@@ -32,6 +33,7 @@
       <module name="nm-framework-parent" target="1.8" />
       <module name="nm-framework-utils" target="1.8" />
       <module name="nm-govern-center" target="1.8" />
+      <module name="nm-govern-gateway" target="1.8" />
       <module name="nm-service-api" target="1.8" />
       <module name="nm-service-auth-ucenter" target="1.8" />
       <module name="nm-service-base-filesystem" target="1.8" />

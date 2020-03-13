@@ -144,4 +144,33 @@ public class AuthService {
         byte[] encode = Base64Utils.encode(string.getBytes());
         return "Basic "+new String(encode);
     }
+
+    //从redis查询令牌
+    public AuthToken getUserToken(String token){
+        //定义token
+        String userToken = "user_token:"+token;
+        //通过redisjwt信息
+        String userTokenString = stringRedisTemplate.opsForValue().get(userToken);
+        //将json串转换成authToken
+        if(userToken!=null){
+            AuthToken authToken = null;
+            try {
+                authToken = JSON.parseObject(userTokenString, AuthToken.class);
+            } catch (Exception e) {
+                LOGGER.error("getUserToken from redis and execute JSON.parseObject error {}",e.getMessage());
+                e.printStackTrace();
+            }
+            return authToken;
+        }
+        return null;
+    }
+
+    //从redis中删除令牌
+    public boolean delToken(String access_token){
+        String name = "user_token:" + access_token;
+        stringRedisTemplate.delete(name);
+        return true;
+    }
+
+
 }
