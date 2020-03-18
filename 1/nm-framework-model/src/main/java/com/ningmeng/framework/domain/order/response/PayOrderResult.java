@@ -1,6 +1,5 @@
 package com.ningmeng.framework.domain.order.response;
 
-import com.ningmeng.framework.domain.order.XcOrdersPay;
 import com.ningmeng.framework.model.response.ResponseResult;
 import com.ningmeng.framework.model.response.ResultCode;
 import lombok.Data;

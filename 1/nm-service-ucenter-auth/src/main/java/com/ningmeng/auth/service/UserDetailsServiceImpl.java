@@ -54,11 +54,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 //从数据库查询用户正确的密码，Spring Security会去比对输入密码的正确性
         String password = userext.getPassword();
-        String user_permission_string = "";
+        //指定用户的权限，这里暂时硬编码  后期从数据库中查询用户权限
+        List<NmMenu> permissions = userext.getPermissions();
+        //取出用户权限
+        List<String> permissionList = new ArrayList<>();
+        for(NmMenu nmMenu:permissions){
+            permissionList.add(nmMenu.getCode());
+        }
 
-        UserJwt userDetails = new UserJwt(username,
-                password,
-                AuthorityUtils.commaSeparatedStringToAuthorityList(user_permission_string));
+        //用户的权限字符串
+        String user_permission_string = StringUtils.join(permissionList.toArray(),",");
+
+        UserJwt userDetails = new UserJwt(username, password, AuthorityUtils.commaSeparatedStringToAuthorityList(user_permission_string));
         userDetails.setId(userext.getId());
         userDetails.setUtype(userext.getUtype());//用户类型
         userDetails.setCompanyId(userext.getCompanyId());//所属企业

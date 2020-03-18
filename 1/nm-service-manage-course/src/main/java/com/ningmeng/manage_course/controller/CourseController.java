@@ -4,6 +4,7 @@ import com.ningmeng.api.courseapi.CourseControllerApi;
 import com.ningmeng.framework.domain.course.*;
 import com.ningmeng.framework.domain.course.ext.CategoryNode;
 import com.ningmeng.framework.domain.course.ext.TeachplanNode;
+import com.ningmeng.framework.domain.course.request.CourseListRequest;
 import com.ningmeng.framework.domain.course.response.AddCourseResult;
 import com.ningmeng.framework.domain.course.response.CoursePublishResult;
 import com.ningmeng.framework.domain.course.response.CourseView;
@@ -13,6 +14,7 @@ import com.ningmeng.framework.model.response.QueryResponseResult;
 import com.ningmeng.framework.model.response.ResponseResult;
 import com.ningmeng.manage_course.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -37,10 +39,18 @@ public class CourseController implements CourseControllerApi{
         return courseService.addTeachplan(teachplan);
     }
 
+    /**
+     * 加过用户权限的方法
+     * @param page
+     * @param size
+     * @param companyId
+     * @return
+     */
+    @PreAuthorize("hasAuthority('course_find_list')")
     @GetMapping("/course/findCourseList/{page}/{size}")
     @Override
-    public QueryResponseResult findCourseList(@PathVariable("page") int page,@PathVariable("size") int size, String companyId) {
-        return courseService.findCourseList(page,size,companyId);
+    public QueryResponseResult findCourseList(@PathVariable("page") int page, @PathVariable("size") int size,CourseListRequest courseListRequest) {
+        return courseService.findCourseList(page,size,courseListRequest.getCompanyId());
     }
 
     @GetMapping("/category/findList/{parentid}")
@@ -97,6 +107,12 @@ public class CourseController implements CourseControllerApi{
         return courseService.saveCoursePic(courseId,pic);
     }
 
+    /**
+     * 添加用户访问权限方法
+     * @param courseId
+     * @return
+     */
+    @PreAuthorize("hasAuthority('course_find_pic')")
     @GetMapping("/coursepic/list/{courseId}")
     @Override
     public CoursePic findCoursePic(@PathVariable("courseId") String courseId) {
@@ -109,6 +125,12 @@ public class CourseController implements CourseControllerApi{
         return courseService.deleteCoursePic(courseId);
     }
 
+    /**
+     * 加过用户权限的方法
+     * @param id
+     * @return
+     */
+    @PreAuthorize("hasAuthority('course_find_view')")
     @GetMapping("/courseview/{id}")
     @Override
     public CourseView courseview(@PathVariable("id") String id) {

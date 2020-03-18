@@ -18,11 +18,41 @@ spring:
 zuul:
   routes:
     manage-course:
-      path: /course
+      path: /course/**
       serviceId: nm-service-manage-course #指定服务id，从Eureka中找到服务的ip和端口
       #url: http://localhost:31200 #也可指定url
       strip-prefix: false #true：代理转发时去掉前缀，false:代理转发时不去掉前缀
       sensitiveHeaders: #默认zuul会屏蔽cookie，cookie不会传到下游服务，这里设置为空则取消默认的黑名单，如果设置了具体的头信息则不会传到下游服务
+    nm-service-learning: #路由名称，名称任意，保持所有路由名称唯一
+      path: /learning/**
+      serviceId: nm‐service‐learning #指定服务id，从Eureka中找到服务的ip和端口
+      strip‐prefix: false
+      sensitiveHeaders:
+    manage-course:
+      path: /course/**
+      serviceId: nm-service-manage-course
+      strip‐prefix: false
+      sensitiveHeaders:
+    manage-cms:
+      path: /cms/**
+      serviceId: nm-service-manage-cms
+      strip-prefix: false
+      sensitiveHeaders:
+    manage-sys:
+      path: /sys/**
+      serviceId: nm-service-manage-cms
+      strip‐prefix: false
+      sensitiveHeaders:
+    service-ucenter:
+      path: /ucenter/**
+      serviceId: nm-service-ucenter
+      sensitiveHeaders:
+      strip-prefix: false
+    nm-service-manage-order:
+      path: /order/**
+      serviceId: nm-service-manage-order
+      sensitiveHeaders:
+      strip-prefix: false
 eureka:
   client:
     registerWithEureka: true #服务注册开关
